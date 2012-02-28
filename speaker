@@ -1,0 +1,97 @@
+#!/usr/bin/env bash
+#
+# speaker | William Durand <william.durand1@gmail.com>
+
+# The `say` binary
+SAY_BIN=say
+
+# The `ffmpeg` binary
+FFMPEG_BIN=ffmpeg
+
+# Print the help text.
+function usage()
+{
+    echo "USAGE:"
+    echo "  $0 [-h] [-d <output directory>] <filename>"
+}
+
+# Convert a text to audio file (aiff) using `say`.
+#
+# $1 - The text to convert.
+# $2 - The audio filename.
+function to_aiff()
+{
+    echo $1 | $SAY_BIN -o $2
+}
+
+# Convert an aiff file to a mp3 file.
+#
+# $1 - The `aiff` filename.
+# $2 - The `mp3` filename.
+function to_mp3()
+{
+    $FFMPEG_BIN -y -i $1 -f mp3 $2
+    rm $1
+}
+
+# Convert an input file into a mp3 file.
+#
+# $1 - The file to convert.
+function speaker()
+{
+    local content=
+    local is_code=0
+    local is_header=0
+
+    echo "Processing: $1"
+
+    while read line ; do
+        if [[ $line =~ ^---$ ]] ; then
+            if [ "0" -eq "$is_header" ] ; then
+                is_header=1
+            else
+                is_header=0
+            fi
+        elif [[ $line =~ ^\`\`\`.*$ ]] ; then
+            if [ "0" -eq "$is_code" ] ; then
+                is_code=1
+            else
+                is_code=0
+            fi
+        elif [[ $line =~ ^.+$ ]] ; then
+            if [ "0" -eq "$is_header" ] && [ "0" -eq "$is_code" ] ; then
+                content="$content $line"
+            fi
+        fi
+    done < $1
+
+    local filename=`echo "$1" | cut -d '.' -f 1`
+    local aiff_file="$filename.aiff"
+    local mp3_file="$filename.mp3"
+
+    echo "- Converting to AIFF ($aiff_file)"
+    to_aiff "$content" "$aiff_file"
+
+    echo "- Converting to MP3 ($mp3_file)"
+    to_mp3 "$aiff_file" "$mp3_file"
+
+    if [ -d "$2" ] ; then
+        mv "$mp3_file" "$2/$mp3_file"
+        echo "=> Done: $!"
+    else
+        echo "=> Done: $mp3_file"
+    fi
+}
+
+if [ '0' -eq "$#" ] || [ '-h' == "$1" ] ; then
+    usage
+    exit
+fi
+
+if [ '3' -eq "$#" ] && [ '-d' == "$1" ] ; then
+    mkdir -p "$2"
+
+    speaker "$3" "$2"
+else
+    speaker "$1"
+fi
