@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+SPEAKER_BIN=`git config hooks.speaker.bin`
+
+if [ -z "$SPEAKER_BIN" ] ; then
+    echo
+    echo 'Warning: you should configure the "hooks.speaker.bin" property to generate MP3 files.'
+    echo
+
+    # Abort to avoid commit errors
+    exit 0
+fi
+
+files=`git diff --cached --name-only --diff-filter=ACM`
+
+for f in $files ; do
+    # Generate mp3 files
+    if [ -f "$f" ] && [[ "$f" =~ ^_posts/.+\.markdown$ ]] ; then
+        $SPEAKER_BIN "$f"
+    fi
+done
+
+(mv -f _posts/*.mp3 mp3/)
+git add mp3/
