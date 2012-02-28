@@ -1,7 +1,11 @@
 Speaker
 =======
 
-Convert a text file in an `mp3` audio file.
+Convert a text file in an `mp3` audio file. Yeah! I know, it's probably useless for you, but I found
+the idea pretty fun, and it's enough for me ;) I would like to thank Zach Holman for all his crazy ideas.
+He gave me inspiration to write this tiny shell script.
+
+See a real use case on my blog: [www.williamdurand.fr](http://www.williamdurand.fr).
 
 
 Dependencies
