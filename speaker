@@ -34,16 +34,14 @@ function to_mp3()
     rm $1
 }
 
-# Convert an input file into a mp3 file.
+# Read a file, sanitizes its content, and output it.
 #
-# $1 - The file to convert.
-function speaker()
+# $1 - The file to read.
+function read_content()
 {
     local content=
     local is_code=0
     local is_header=0
-
-    echo "Processing: $1"
 
     while read line ; do
         if [[ $line =~ ^---$ ]] ; then
@@ -63,7 +61,22 @@ function speaker()
                 content="$content $line"
             fi
         fi
+
+        # Sanitize markdown content
+        content=`echo "$content" | sed -e 's/[\*_]//g'`
+        content=`echo "$content" | sed -e 's/\[\(.*\)\](\(.*\))/\1/g'`
     done < $1
+
+    echo $content
+}
+
+# Convert an input file into a mp3 file.
+#
+# $1 - The file to convert.
+function speaker()
+{
+    echo "Processing: $1"
+    local content=`read_content $1`
 
     local filename=`echo "$1" | cut -d '.' -f 1`
     local aiff_file="$filename.aiff"
