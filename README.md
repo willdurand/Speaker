@@ -13,7 +13,7 @@ Dependencies
 
 You need the `say` command which is bundled with Mac OSX, and `ffmpeg` you can install by running:
 
-    brew install --use-clang --HEAD ffmpe
+    brew install --use-clang --HEAD ffmpeg
 
 
 Usage
