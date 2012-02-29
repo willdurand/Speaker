@@ -56,19 +56,23 @@ function read_content()
             else
                 is_code=0
             fi
+        elif [[ $line =~ ^\{\%\ highlight\ .+$ ]] ; then
+            is_code=1
+        elif [[ $line =~ '{% endhighlight %}' ]] ; then
+            is_code=0
         elif [[ $line =~ ^.+$ ]] ; then
             if [ "0" -eq "$is_header" ] && [ "0" -eq "$is_code" ] ; then
                 content="$content $line"
+
+                # Sanitize markdown content
+                content=`echo "$content" | sed -e 's/[\*_]//g'`
+                content=`echo "$content" | sed -e 's/\[\(.*\)\](\(.*\))/\1/g'`
+                content=`echo "$content" | sed -e 's/:[p|D]/./g'`
+                content=`echo "$content" | sed -e 's/=\{4,\}//g'`
+                content=`echo "$content" | sed -e 's/#\{2,\}//g'`
+                content=`echo "$content" | sed -e 's/-\{3,\}//g'`
             fi
         fi
-
-        # Sanitize markdown content
-        content=`echo "$content" | sed -e 's/[\*_]//g'`
-        content=`echo "$content" | sed -e 's/\[\(.*\)\](\(.*\))/\1/g'`
-        content=`echo "$content" | sed -e 's/:[p|D]/./g'`
-        content=`echo "$content" | sed -e 's/=\{4,\}//g'`
-        content=`echo "$content" | sed -e 's/#\{2,\}//g'`
-        content=`echo "$content" | sed -e 's/-\{3,\}//g'`
     done < $1
 
     echo $content
