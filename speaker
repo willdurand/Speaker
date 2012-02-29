@@ -66,6 +66,9 @@ function read_content()
         content=`echo "$content" | sed -e 's/[\*_]//g'`
         content=`echo "$content" | sed -e 's/\[\(.*\)\](\(.*\))/\1/g'`
         content=`echo "$content" | sed -e 's/:[p|D]/./g'`
+        content=`echo "$content" | sed -e 's/=\{4,\}//g'`
+        content=`echo "$content" | sed -e 's/#\{2,\}//g'`
+        content=`echo "$content" | sed -e 's/-\{3,\}//g'`
     done < $1
 
     echo $content
