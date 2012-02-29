@@ -2,8 +2,11 @@
 #
 # speaker | William Durand <william.durand1@gmail.com>
 
+SYSTEM=`uname`
+TTS_LANG=fr
 # The `say` binary
 SAY_BIN=say
+ESPEAK=espeak
 
 # The `ffmpeg` binary
 FFMPEG_BIN=ffmpeg
@@ -22,6 +25,15 @@ function usage()
 function to_aiff()
 {
     echo $1 | $SAY_BIN -o $2
+}
+
+# Convert a text to audio file (wav) using `espeak`.
+#
+# $1 - The text to convert.
+# $2 - The audio filename.
+function to_wav()
+{
+    $ESPEAK -v $TTS_LANG -b1 -w $2 "$1"
 }
 
 # Convert an aiff file to a mp3 file.
@@ -78,23 +90,49 @@ function read_content()
     echo $content
 }
 
-# Convert an input file into a mp3 file.
-#
-# $1 - The file to convert.
-function speaker()
+# $1 - The text to convert
+function convert_with_espeak()
 {
-    echo "Processing: $1"
+    local content=`read_content $1`
+
+    local filename=`echo "$1" | cut -d '.' -f 1`
+    local wav_file="$filename.wav"
+    local mp3_file="$filename.mp3"
+
+    to_wav "$content" "$wav_file"
+    to_mp3 "$wav_file" "$mp3_file"
+
+    echo $mp3_file
+}
+
+# $1 - The file to convert
+function convert_with_say()
+{
     local content=`read_content $1`
 
     local filename=`echo "$1" | cut -d '.' -f 1`
     local aiff_file="$filename.aiff"
     local mp3_file="$filename.mp3"
 
-    echo "- Converting to AIFF ($aiff_file)"
     to_aiff "$content" "$aiff_file"
-
-    echo "- Converting to MP3 ($mp3_file)"
     to_mp3 "$aiff_file" "$mp3_file"
+
+    echo $mp3_file
+}
+
+
+# Convert an input file into a mp3 file.
+#
+# $1 - The file to convert.
+function speaker()
+{
+    echo "Processing: $1"
+
+    if [ $SYSTEM == "Linux" ]; then
+        mp3_file=`convert_with_espeak "$1"`
+    elif [ $SYSTEM == "Darwin" ]; then
+        mp3_file=`convert_with_say "$1"`
+    fi
 
     if [ -d "$2" ] ; then
         mv "$mp3_file" "$2/$mp3_file"
