@@ -3,7 +3,7 @@
 # speaker | William Durand <william.durand1@gmail.com>
 
 SYSTEM=`uname`
-TTS_LANG=fr
+TTS_LANG=en-us
 # The `say` binary
 SAY_BIN=say
 ESPEAK=espeak
@@ -33,7 +33,7 @@ function to_aiff()
 # $2 - The audio filename.
 function to_wav()
 {
-    $ESPEAK -v $TTS_LANG -b1 -w $2 "$1"
+    $ESPEAK -a 85 -s 135 -p 45 -v $TTS_LANG -b1 -w $2 "$1"
 }
 
 # Convert an aiff file to a mp3 file.
