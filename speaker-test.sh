@@ -1,6 +1,6 @@
 #!/usr/bin/env roundup
 #
-# speaker-test.sh | William Durand <william.durand1@gmail.com>
+# speaker-test.sh | William Durand
 
 describe "speaker"
 

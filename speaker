@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# speaker | William Durand <william.durand1@gmail.com>
+# speaker | William Durand
 
 SYSTEM=`uname`
 TTS_LANG=en-us
